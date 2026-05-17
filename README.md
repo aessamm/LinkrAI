@@ -1,76 +1,123 @@
-# Linkrai — Project Documentation Pack
+# Linkrai
 
-This documentation pack is the single source of truth for building **Linkrai**.
+**Linkrai** is an AI-powered personal link memory app.
 
-## Product Summary
+Users save URLs from social media, websites, videos, articles, newsletters, and tools. Linkrai will
+analyze saved links, generate summaries, categories, tags, and embeddings, then help users search
+their saved library by keyword or semantic meaning.
 
-**Linkrai** is an AI-powered personal link memory app. Users can save URLs from social media, websites, articles, videos, tools, newsletters, and other online sources. Linkrai extracts metadata and available content, summarizes the link using AI, auto-categorizes it, generates tags/keywords, creates embeddings, and enables users to search their saved library by exact keyword or semantic meaning.
+> Linkrai — Your AI memory for saved links.
 
-## Positioning
+Arabic display:
 
-> **Linkrai — Your AI memory for saved links.**
+> لينكراي — ذاكرتك الذكية لكل رابط حفظته.
 
-Arabic positioning:
+## Sprint 0 Scope
 
-> **لينكراي — ذاكرتك الذكية لكل رابط حفظته.**
+This repository currently contains the local development foundation only:
 
-The product should not be positioned as a basic bookmark manager. The core value is **saving links quickly and retrieving them later by meaning**.
+- Monorepo folder structure.
+- Documentation pack.
+- Environment variable template.
+- Docker Compose for PostgreSQL and Redis.
+- Formatting baseline.
+- GitHub Actions workflow that validates the expected repository structure.
 
-## Latest Brand Decision
+No backend, mobile, web dashboard, or worker implementation has been added yet.
 
-- **Product name:** Linkrai
-- **Arabic display name:** لينكراي
-- **Primary tagline:** Your AI memory for saved links.
-- **Arabic tagline:** ذاكرتك الذكية لكل رابط حفظته.
-- **Domain candidates discussed:** linkrai.app, linkrai.io, linkrai.link, linkrai.ai
+## Repository Structure
 
-Use **Linkrai** as the official product name across code comments, docs, UI labels, design files, prompts, and project references.
+```text
+linkrai/
+  apps/
+    mobile/
+    web/
+  services/
+    api/
+    worker/
+  packages/
+    shared-types/
+  infra/
+    docker/
+  docs/
+  .github/
+    workflows/
+  AGENTS.md
+  DESIGN.md
+  README.md
+  docker-compose.yml
+```
 
 ## Recommended Stack
 
-- **Mobile:** Flutter
-- **Backend API:** NestJS + TypeScript
-- **Database:** PostgreSQL + pgvector
-- **Queue:** Redis + BullMQ
-- **Worker:** Node.js/TypeScript worker service
-- **Auth:** Supabase Auth JWT verified by NestJS
-- **Billing:** RevenueCat for mobile subscriptions; Stripe/web billing later
-- **Web Dashboard:** Next.js App Router + Tailwind CSS + shadcn/ui
-- **Observability:** Sentry + PostHog
-- **Infra:** Docker + Docker Compose + GitHub Actions
+- Mobile: Flutter
+- Web dashboard: Next.js App Router
+- Backend API: NestJS + TypeScript
+- Database: PostgreSQL + pgvector
+- Queue: Redis + BullMQ
+- Worker: Node.js/TypeScript
+- Auth: Supabase Auth JWT verified by NestJS
+- Subscriptions: RevenueCat for mobile, Stripe/web billing later
 
-## Documentation Map
+## Local Setup
 
-- `AGENTS.md` — Codex/AI agent working rules.
-- `DESIGN.md` — Complete visual design system with light and dark themes.
-- `docs/00-master-plan.md` — Overall project strategy, architecture, phases, and sprints.
-- `docs/01-product-requirements.md` — PRD and MVP requirements.
-- `docs/02-backend-plan.md` — Backend modules and implementation rules.
-- `docs/03-mobile-plan.md` — Flutter mobile implementation plan.
-- `docs/04-ai-pipeline-plan.md` — Worker and AI processing plan.
-- `docs/05-billing-subscription-plan.md` — Subscription, entitlement, and usage model.
-- `docs/06-web-dashboard-plan.md` — Web dashboard scope.
-- `docs/07-devops-qa-plan.md` — DevOps, QA, observability, and release plan.
-- `docs/08-codex-execution-guide.md` — How to work with Codex safely.
-- `docs/09-sprint-prompts.md` — Sprint-by-sprint Codex prompts.
-- `docs/10-database-schema.md` — Initial database schema.
-- `docs/11-api-contracts.md` — API contracts.
-- `docs/12-review-checklists.md` — Sprint review checklists.
-- `docs/13-project-glossary.md` — Shared glossary.
-- `docs/14-quickstart-for-ahmed.md` — Practical start guide.
-- `docs/15-linkrai-app-brief.md` — Product brief, use cases, and feature summary.
-- `docs/16-brand-naming-and-domains.md` — Brand naming decision and domain guidance.
+1. Copy the environment template:
 
-## How to Use This Pack
+   ```bash
+   cp .env.example .env
+   ```
 
-1. Create a new Git repository named `linkrai` or similar.
-2. Copy this documentation pack into the repository root.
-3. Commit the documentation first.
-4. Give Codex the prompt from `docs/09-sprint-prompts.md` for **Sprint 0 only**.
-5. Review Codex changes using `docs/12-review-checklists.md`.
-6. Commit after each sprint.
-7. Move to the next sprint only after the current one passes acceptance criteria.
+2. Start local infrastructure:
 
-## Key Rule
+   ```bash
+   docker compose up -d
+   ```
 
-Do **not** ask Codex to implement the whole project in one task. Give Codex the full documentation as context, then assign **one sprint at a time**.
+3. Confirm services are running:
+
+   ```bash
+   docker compose ps
+   ```
+
+4. Stop local infrastructure when finished:
+
+   ```bash
+   docker compose down
+   ```
+
+Default local service URLs:
+
+- PostgreSQL: `postgresql://linkrai:linkrai@localhost:5432/linkrai`
+- Redis: `redis://localhost:6379`
+
+## Formatting
+
+This Sprint 0 baseline includes Prettier config for repository metadata and the root README. The
+existing documentation pack is intentionally ignored so Sprint 0 does not rewrite it.
+
+Run:
+
+```bash
+npm run format:check
+```
+
+To format supported files:
+
+```bash
+npm run format
+```
+
+## Documentation
+
+Important project documents:
+
+- `AGENTS.md` — AI agent working rules.
+- `DESIGN.md` — Linkrai design system.
+- `docs/00-master-plan.md` — Product strategy, architecture, phases, and sprints.
+- `docs/15-linkrai-app-brief.md` — Product brief and feature summary.
+- `docs/16-brand-naming-and-domains.md` — Brand naming and domain guidance.
+
+## Development Rule
+
+Implement one sprint at a time. Do not build future phases until that sprint is explicitly
+requested.

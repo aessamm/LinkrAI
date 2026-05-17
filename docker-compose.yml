@@ -1,0 +1,36 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: linkrai-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: linkrai
+      POSTGRES_USER: linkrai
+      POSTGRES_PASSWORD: linkrai
+    ports:
+      - "5432:5432"
+    volumes:
+      - linkrai-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U linkrai -d linkrai"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: linkrai-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - linkrai-redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  linkrai-postgres-data:
+  linkrai-redis-data:

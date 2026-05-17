@@ -1,0 +1,14 @@
+{
+  "name": "linkrai",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Linkrai monorepo foundation. Your AI memory for saved links.",
+  "scripts": {
+    "format": "prettier --write \"**/*.{md,json,yml,yaml}\"",
+    "format:check": "prettier --check \"**/*.{md,json,yml,yaml}\"",
+    "validate:structure": "node scripts/validate-structure.mjs"
+  },
+  "devDependencies": {
+    "prettier": "^3.3.3"
+  }
+}
