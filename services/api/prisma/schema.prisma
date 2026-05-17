@@ -1,0 +1,166 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String             @id @default(uuid()) @db.Uuid
+  supabaseUserId String             @unique @map("supabase_user_id")
+  email          String             @unique
+  displayName    String?            @map("display_name")
+  authProvider   String?            @map("auth_provider")
+  createdAt      DateTime           @default(now()) @map("created_at")
+  updatedAt      DateTime           @updatedAt @map("updated_at")
+  profile        UserProfile?
+  subscriptions  UserSubscription[]
+  usageCounters  UsageCounter[]
+  categories     Category[]
+  tags           Tag[]
+  savedItems     SavedItem[]
+
+  @@map("users")
+}
+
+model Plan {
+  id                         String   @id @default(uuid()) @db.Uuid
+  code                       String   @unique
+  name                       String
+  monthlyLinkLimit           Int      @map("monthly_link_limit")
+  monthlyAiSummaryLimit      Int      @map("monthly_ai_summary_limit")
+  monthlySemanticSearchLimit Int      @map("monthly_semantic_search_limit")
+  maxCategories              Int?     @map("max_categories")
+  featuresJson               Json     @default("{}") @map("features_json")
+  createdAt                  DateTime @default(now()) @map("created_at")
+  updatedAt                  DateTime @updatedAt @map("updated_at")
+
+  @@map("plans")
+}
+
+model UserSubscription {
+  id                     String    @id @default(uuid()) @db.Uuid
+  userId                 String    @map("user_id") @db.Uuid
+  provider               String
+  providerCustomerId     String?   @map("provider_customer_id")
+  providerSubscriptionId String?   @map("provider_subscription_id")
+  entitlement            String
+  status                 String
+  currentPeriodStart     DateTime? @map("current_period_start")
+  currentPeriodEnd       DateTime? @map("current_period_end")
+  createdAt              DateTime  @default(now()) @map("created_at")
+  updatedAt              DateTime  @updatedAt @map("updated_at")
+  user                   User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@map("user_subscriptions")
+}
+
+model UserProfile {
+  id                  String   @id @default(uuid()) @db.Uuid
+  userId              String   @unique @map("user_id") @db.Uuid
+  preferredLanguage   String   @default("en") @map("preferred_language")
+  timezone            String?
+  onboardingCompleted Boolean  @default(false) @map("onboarding_completed")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+model UsageCounter {
+  id                   String   @id @default(uuid()) @db.Uuid
+  userId               String   @map("user_id") @db.Uuid
+  periodKey            String   @map("period_key")
+  savedLinksCount      Int      @default(0) @map("saved_links_count")
+  aiSummariesCount     Int      @default(0) @map("ai_summaries_count")
+  semanticSearchCount  Int      @default(0) @map("semantic_search_count")
+  youtubeAnalysisCount Int      @default(0) @map("youtube_analysis_count")
+  pdfAnalysisCount     Int      @default(0) @map("pdf_analysis_count")
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, periodKey])
+  @@map("usage_counters")
+}
+
+model Category {
+  id            String      @id @default(uuid()) @db.Uuid
+  userId        String      @map("user_id") @db.Uuid
+  name          String
+  slug          String
+  isAiGenerated Boolean     @default(false) @map("is_ai_generated")
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  savedItems    SavedItem[]
+
+  @@unique([userId, slug])
+  @@map("categories")
+}
+
+model Tag {
+  id            String         @id @default(uuid()) @db.Uuid
+  userId        String         @map("user_id") @db.Uuid
+  name          String
+  slug          String
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  savedItemTags SavedItemTag[]
+
+  @@unique([userId, slug])
+  @@map("tags")
+}
+
+model SavedItem {
+  id               String         @id @default(uuid()) @db.Uuid
+  userId           String         @map("user_id") @db.Uuid
+  categoryId       String?        @map("category_id") @db.Uuid
+  url              String
+  normalizedUrl    String         @map("normalized_url")
+  canonicalUrl     String?        @map("canonical_url")
+  title            String?
+  description      String?
+  thumbnailUrl     String?        @map("thumbnail_url")
+  sourceDomain     String?        @map("source_domain")
+  sourcePlatform   String?        @map("source_platform")
+  contentType      String?        @map("content_type")
+  language         String?
+  summary          String?
+  shortSummary     String?        @map("short_summary")
+  rawText          String?        @map("raw_text")
+  mainPoints       Json?          @map("main_points")
+  processingStatus String         @default("pending") @map("processing_status")
+  extractionStatus String?        @map("extraction_status")
+  processingError  String?        @map("processing_error")
+  userNotes        String?        @map("user_notes")
+  createdAt        DateTime       @default(now()) @map("created_at")
+  updatedAt        DateTime       @updatedAt @map("updated_at")
+  deletedAt        DateTime?      @map("deleted_at")
+  user             User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category         Category?      @relation(fields: [categoryId], references: [id])
+  savedItemTags    SavedItemTag[]
+
+  @@index([userId])
+  @@index([normalizedUrl])
+  @@index([categoryId])
+  @@index([sourceDomain])
+  @@index([processingStatus])
+  @@index([createdAt])
+  @@map("saved_items")
+}
+
+model SavedItemTag {
+  savedItemId String    @map("saved_item_id") @db.Uuid
+  tagId       String    @map("tag_id") @db.Uuid
+  savedItem   SavedItem @relation(fields: [savedItemId], references: [id], onDelete: Cascade)
+  tag         Tag       @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([savedItemId, tagId])
+  @@map("saved_item_tags")
+}

@@ -12,9 +12,9 @@ Arabic display:
 
 > لينكراي — ذاكرتك الذكية لكل رابط حفظته.
 
-## Sprint 0 Scope
+## Current Scope
 
-This repository currently contains the local development foundation only:
+This repository currently contains:
 
 - Monorepo folder structure.
 - Documentation pack.
@@ -22,8 +22,15 @@ This repository currently contains the local development foundation only:
 - Docker Compose for PostgreSQL and Redis.
 - Formatting baseline.
 - GitHub Actions workflow that validates the expected repository structure.
+- Sprint 1 NestJS API foundation with Supabase JWT verification and local user profiles.
+- Sprint 2 plans, subscription state, plan seeding, usage limits, and `GET /api/me/subscription`.
+- Sprint 3 saved-items API for authenticated URL save/list/detail/update/delete with saved-link
+  usage enforcement.
+- Sprint 4 Redis/BullMQ queue integration and a worker foundation that simulates link processing.
+- Sprint 5 worker extraction for metadata, canonical URL, source domain, content type, readable
+  article text, and extraction status.
 
-No backend, mobile, web dashboard, or worker implementation has been added yet.
+No AI summarization, embeddings, mobile, or web dashboard implementation has been added yet.
 
 ## Repository Structure
 
@@ -89,6 +96,135 @@ Default local service URLs:
 
 - PostgreSQL: `postgresql://linkrai:linkrai@localhost:5432/linkrai`
 - Redis: `redis://localhost:6379`
+
+## Backend API Setup
+
+The Sprint 1 API service lives in `services/api`.
+
+1. Install API dependencies:
+
+   ```bash
+   cd services/api
+   npm install
+   ```
+
+2. Set local environment variables:
+
+   ```bash
+   export DATABASE_URL="postgresql://linkrai:linkrai@localhost:5432/linkrai"
+   export REDIS_URL="redis://localhost:6379"
+   export SUPABASE_JWT_SECRET="replace-me"
+   ```
+
+   On PowerShell:
+
+   ```powershell
+   $env:DATABASE_URL="postgresql://linkrai:linkrai@localhost:5432/linkrai"
+   $env:REDIS_URL="redis://localhost:6379"
+   $env:SUPABASE_JWT_SECRET="replace-me"
+   ```
+
+3. Run Prisma migrations:
+
+   ```bash
+   npm run prisma:migrate
+   ```
+
+4. Start the API:
+
+   ```bash
+   npm run start:dev
+   ```
+
+5. Call the authenticated user endpoint:
+
+   ```http
+   GET http://localhost:3000/api/me
+   Authorization: Bearer <supabase_jwt>
+   ```
+
+Sprint 3 saved-items endpoints are also available:
+
+```http
+POST http://localhost:3000/api/saved-items
+GET http://localhost:3000/api/saved-items?page=1&limit=20
+GET http://localhost:3000/api/saved-items/:id
+PATCH http://localhost:3000/api/saved-items/:id
+DELETE http://localhost:3000/api/saved-items/:id
+Authorization: Bearer <supabase_jwt>
+```
+
+`POST /api/saved-items` creates a saved item immediately with `processing_status = pending` and
+enqueues a BullMQ job on `link-processing.queue`.
+
+Useful API commands:
+
+```bash
+npm run build
+npm test
+npm run prisma:generate
+npm run prisma:seed
+npm run prisma:deploy
+```
+
+## Worker Setup
+
+The worker service lives in `services/worker`. It consumes `link-processing.queue`, marks a saved
+item as `processing`, fetches the saved URL, extracts metadata/readable text when available, then
+marks it as `completed`. If extraction fails, it records the failure and marks the item as `failed`.
+
+1. Install worker dependencies:
+
+   ```bash
+   cd services/worker
+   npm install
+   ```
+
+2. Generate the worker Prisma client:
+
+   ```bash
+   npm run prisma:generate
+   ```
+
+3. Set local environment variables:
+
+   ```bash
+   export DATABASE_URL="postgresql://linkrai:linkrai@localhost:5432/linkrai"
+   export REDIS_URL="redis://localhost:6379"
+   ```
+
+   On PowerShell:
+
+   ```powershell
+   $env:DATABASE_URL="postgresql://linkrai:linkrai@localhost:5432/linkrai"
+   $env:REDIS_URL="redis://localhost:6379"
+   ```
+
+4. Start the worker:
+
+   ```bash
+   npm run start:dev
+   ```
+
+Useful worker commands:
+
+```bash
+npm run build
+npm test
+npm run prisma:generate
+```
+
+Sprint 5 extraction stores:
+
+- `title`
+- `description`
+- `thumbnail_url`
+- `canonical_url`
+- `source_domain`
+- `content_type`
+- `raw_text`
+- `extraction_status`
+- `processing_error` when extraction fails
 
 ## Formatting
 

@@ -1,0 +1,44 @@
+{
+  "name": "@linkrai/worker",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Linkrai background worker service.",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "start:dev": "ts-node src/index.ts",
+    "test": "jest --runInBand",
+    "prisma:generate": "prisma generate"
+  },
+  "dependencies": {
+    "@mozilla/readability": "^0.6.0",
+    "@prisma/client": "^6.19.0",
+    "bullmq": "^5.64.1",
+    "cheerio": "^1.2.0",
+    "ioredis": "^5.8.2",
+    "jsdom": "^22.1.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/jsdom": "^21.1.7",
+    "@types/node": "^24.10.1",
+    "jest": "^30.2.0",
+    "prisma": "^6.19.0",
+    "ts-jest": "^29.4.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "rootDir": "src",
+    "testRegex": ".*\\.spec\\.ts$",
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "testEnvironment": "node"
+  }
+}
