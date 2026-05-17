@@ -17,10 +17,12 @@ out/
 
 # Flutter and mobile generated files
 .dart_tool/
+.cxx/
 .flutter-plugins
 .flutter-plugins-dependencies
 .packages
 pubspec.lock
+!apps/mobile/pubspec.lock
 build/
 ios/Pods/
 

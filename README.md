@@ -29,8 +29,14 @@ This repository currently contains:
 - Sprint 4 Redis/BullMQ queue integration and a worker foundation that simulates link processing.
 - Sprint 5 worker extraction for metadata, canonical URL, source domain, content type, readable
   article text, and extraction status.
+- Sprint 6 AI enrichment for summaries, short summaries, language, categories, tags, and main
+  points.
+- Sprint 7 pgvector embeddings and saved-item search by keyword, semantic meaning, or hybrid mode.
+- Sprint 8 Flutter mobile foundation with auth screens, secure token storage, routing, theme, and
+  `/me` API integration.
 
-No AI summarization, embeddings, mobile, or web dashboard implementation has been added yet.
+No mobile link library, share extension, subscriptions, or web dashboard implementation has been
+added yet.
 
 ## Repository Structure
 
@@ -114,6 +120,7 @@ The Sprint 1 API service lives in `services/api`.
    export DATABASE_URL="postgresql://linkrai:linkrai@localhost:5432/linkrai"
    export REDIS_URL="redis://localhost:6379"
    export SUPABASE_JWT_SECRET="replace-me"
+   export OPENAI_API_KEY="replace-me"
    ```
 
    On PowerShell:
@@ -122,6 +129,7 @@ The Sprint 1 API service lives in `services/api`.
    $env:DATABASE_URL="postgresql://linkrai:linkrai@localhost:5432/linkrai"
    $env:REDIS_URL="redis://localhost:6379"
    $env:SUPABASE_JWT_SECRET="replace-me"
+   $env:OPENAI_API_KEY="replace-me"
    ```
 
 3. Run Prisma migrations:
@@ -154,6 +162,18 @@ DELETE http://localhost:3000/api/saved-items/:id
 Authorization: Bearer <supabase_jwt>
 ```
 
+Sprint 7 search is available at:
+
+```http
+GET http://localhost:3000/api/saved-items/search?q=research&mode=keyword
+GET http://localhost:3000/api/saved-items/search?q=things I saved about vector search&mode=semantic
+GET http://localhost:3000/api/saved-items/search?q=AI memory&mode=hybrid&tag=ai&category_id=<uuid>&source_platform=web&from=2026-05-01&to=2026-05-31
+Authorization: Bearer <supabase_jwt>
+```
+
+Semantic and hybrid search require `OPENAI_API_KEY` and count against the user's monthly semantic
+search limit.
+
 `POST /api/saved-items` creates a saved item immediately with `processing_status = pending` and
 enqueues a BullMQ job on `link-processing.queue`.
 
@@ -171,7 +191,9 @@ npm run prisma:deploy
 
 The worker service lives in `services/worker`. It consumes `link-processing.queue`, marks a saved
 item as `processing`, fetches the saved URL, extracts metadata/readable text when available, then
-marks it as `completed`. If extraction fails, it records the failure and marks the item as `failed`.
+enriches the item with AI when `OPENAI_API_KEY` is configured. If AI enrichment fails, the extracted
+item still completes and the AI error is recorded. When AI is configured, the worker also stores a
+pgvector embedding after extraction/enrichment so the API can run semantic search.
 
 1. Install worker dependencies:
 
@@ -191,6 +213,7 @@ marks it as `completed`. If extraction fails, it records the failure and marks t
    ```bash
    export DATABASE_URL="postgresql://linkrai:linkrai@localhost:5432/linkrai"
    export REDIS_URL="redis://localhost:6379"
+   export OPENAI_API_KEY="replace-me"
    ```
 
    On PowerShell:
@@ -198,6 +221,7 @@ marks it as `completed`. If extraction fails, it records the failure and marks t
    ```powershell
    $env:DATABASE_URL="postgresql://linkrai:linkrai@localhost:5432/linkrai"
    $env:REDIS_URL="redis://localhost:6379"
+   $env:OPENAI_API_KEY="replace-me"
    ```
 
 4. Start the worker:
@@ -225,6 +249,53 @@ Sprint 5 extraction stores:
 - `raw_text`
 - `extraction_status`
 - `processing_error` when extraction fails
+
+Sprint 6 AI enrichment stores:
+
+- `summary`
+- `short_summary`
+- `language`
+- `main_points`
+- AI-generated category
+- AI-generated tags
+
+AI summary usage is incremented only after successful enrichment.
+
+Sprint 7 embedding storage uses `text-embedding-3-small` by default. Set `OPENAI_EMBEDDING_MODEL` to
+override it for both API query embeddings and worker item embeddings.
+
+## Mobile App Setup
+
+The Flutter app lives in `apps/mobile`.
+
+1. Install dependencies:
+
+   ```bash
+   cd apps/mobile
+   flutter pub get
+   ```
+
+2. Run the app with Supabase Auth and API configuration:
+
+   ```bash
+   flutter run \
+     --dart-define=SUPABASE_URL="https://your-project.supabase.co" \
+     --dart-define=SUPABASE_ANON_KEY="your-publishable-or-anon-key" \
+     --dart-define=LINKRAI_API_BASE_URL="http://10.0.2.2:3000/api"
+   ```
+
+   Use `http://localhost:3000/api` for desktop/web targets or iOS simulator when appropriate.
+
+Sprint 8 includes Login, Register, Forgot password, Onboarding placeholder, and Library placeholder
+screens. Login/register use Supabase Auth, store the access token with `flutter_secure_storage`, and
+call `GET /me` through the NestJS API before entering the app.
+
+Useful mobile commands:
+
+```bash
+flutter analyze
+flutter test
+```
 
 ## Formatting
 

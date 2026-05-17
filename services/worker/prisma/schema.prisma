@@ -134,6 +134,7 @@ model SavedItem {
   summary          String?
   shortSummary     String?        @map("short_summary")
   rawText          String?        @map("raw_text")
+  embedding        Unsupported("vector")?
   mainPoints       Json?          @map("main_points")
   processingStatus String         @default("pending") @map("processing_status")
   extractionStatus String?        @map("extraction_status")

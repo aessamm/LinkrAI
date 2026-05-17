@@ -5,6 +5,7 @@ import { MeModule } from "./me/me.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { QueueModule } from "./queue/queue.module";
 import { SavedItemsModule } from "./saved-items/saved-items.module";
+import { SearchModule } from "./search/search.module";
 import { UsageModule } from "./usage/usage.module";
 import { UsersModule } from "./users/users.module";
 
@@ -19,6 +20,7 @@ import { UsersModule } from "./users/users.module";
     MeModule,
     QueueModule,
     UsageModule,
+    SearchModule,
     SavedItemsModule,
   ],
 })

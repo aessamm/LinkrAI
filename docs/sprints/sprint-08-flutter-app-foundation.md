@@ -6,29 +6,29 @@ Create Flutter app foundation with auth and API integration.
 
 ## Tasks
 
-- [ ] Create Flutter app under `apps/mobile`.
-- [ ] Add Riverpod.
-- [ ] Add GoRouter.
-- [ ] Add Dio API client.
-- [ ] Add secure token storage.
-- [ ] Add app theme using Linkrai design direction.
-- [ ] Add Login screen.
-- [ ] Add Register screen.
-- [ ] Add Forgot Password screen.
-- [ ] Add Onboarding placeholder.
-- [ ] Add Library placeholder.
-- [ ] Integrate with backend auth flow.
-- [ ] Call `GET /me` after login.
-- [ ] Add basic loading states.
-- [ ] Add basic error states.
+- [x] Create Flutter app under `apps/mobile`.
+- [x] Add Riverpod.
+- [x] Add GoRouter.
+- [x] Add Dio API client.
+- [x] Add secure token storage.
+- [x] Add app theme using Linkrai design direction.
+- [x] Add Login screen.
+- [x] Add Register screen.
+- [x] Add Forgot Password screen.
+- [x] Add Onboarding placeholder.
+- [x] Add Library placeholder.
+- [x] Integrate with backend auth flow.
+- [x] Call `GET /me` after login.
+- [x] Add basic loading states.
+- [x] Add basic error states.
 
 ## Acceptance Criteria
 
-- [ ] Flutter app runs.
-- [ ] User can log in/register.
-- [ ] Token is stored securely.
-- [ ] App can call `GET /me`.
-- [ ] No link library implementation yet.
+- [x] Flutter app runs.
+- [x] User can log in/register.
+- [x] Token is stored securely.
+- [x] App can call `GET /me`.
+- [x] No link library implementation yet.
 
 ## Scope Guard
 

@@ -6,26 +6,31 @@ Add AI enrichment for summaries, categories, and tags.
 
 ## Tasks
 
-- [ ] Create AI provider abstraction.
-- [ ] Add provider implementation using `OPENAI_API_KEY`.
-- [ ] Generate summary.
-- [ ] Generate short summary.
-- [ ] Generate language.
-- [ ] Generate keywords/tags.
-- [ ] Generate suggested category.
-- [ ] Prefer existing categories if available.
-- [ ] Create category if needed.
-- [ ] Attach tags to saved item.
-- [ ] Increment AI summary usage only after successful generation.
-- [ ] Add mocked tests for AI provider.
-- [ ] Add mocked tests for worker logic.
+- [x] Create AI provider abstraction.
+- [x] Add provider implementation using `OPENAI_API_KEY`.
+- [x] Generate summary.
+- [x] Generate short summary.
+- [x] Generate language.
+- [x] Generate keywords/tags.
+- [x] Generate suggested category.
+- [x] Prefer existing categories if available.
+- [x] Create category if needed.
+- [x] Attach tags to saved item.
+- [x] Increment AI summary usage only after successful generation.
+- [x] Add mocked tests for AI provider.
+- [x] Add mocked tests for worker logic.
 
 ## Acceptance Criteria
 
-- [ ] Processed item gets summary, category, and tags.
-- [ ] AI failures do not break saved item permanently.
-- [ ] Usage is tracked.
-- [ ] No embeddings or semantic search yet.
+- [x] Processed item gets summary, category, and tags.
+- [x] AI failures do not break saved item permanently.
+- [x] Usage is tracked.
+- [x] No embeddings or semantic search yet.
+
+## Notes
+
+The worker skips AI enrichment when `OPENAI_API_KEY` is not configured or when the monthly AI summary
+limit is exhausted. In both cases, extraction can still complete.
 
 ## Scope Guard
 
